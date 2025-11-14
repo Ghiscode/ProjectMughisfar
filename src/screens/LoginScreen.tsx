@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// (1) --- TAMBAHAN BARU --- (Import Image)
 import {
   View,
   Text,
@@ -8,58 +7,60 @@ import {
   Alert,
   Image,
   ScrollView,
+  StatusBar,
 } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-// --- (2) IMPORT KOMPONEN REUSABLE & ASET ---
 import CustomTextInput from '../components/CustomTextInput';
 import PrimaryButton from '../components/PrimaryButton';
-import BackgroundSiluet from '../components/BackgroundSiluet'; // Background Pattern
-const logoSource = require('../assets/images/bulanSabitLogin.png'); // Logo Login
-
-// ---
+import BackgroundSiluet from '../components/BackgroundSiluet';
+import { loginUser } from '../api/AuthService';
 import { RootStackParamList } from '../types/navigation';
+const logoSource = require('../assets/images/bulanSabitLogin.png');
 
 type LoginScreenProps = StackScreenProps<RootStackParamList, 'Login'>;
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
-    // if (email === '' || password === '') {
-    //   Alert.alert('Error', 'Email dan password tidak boleh kosong.');
-    //   return;
-    // }
-    // Navigasi yang sudah benar
-    navigation.replace('AppTabs', {
-      screen: 'Beranda',
-    });
+  const handleLogin = async () => {
+    if (email === '' || password === '') {
+      Alert.alert('Error', 'Email dan password tidak boleh kosong.');
+      return;
+    }
+
+    setIsLoading(true); 
+
+    try {
+      const userData = await loginUser(email, password);
+      navigation.replace('AppTabs', {
+        screen: 'Beranda',
+      });
+    } catch (error: any) {
+      Alert.alert('Login Gagal', error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    // (3) --- Ganti <View> dengan <ScrollView> agar bisa scroll saat keyboard muncul ---
     <ScrollView
       contentContainerStyle={styles.scrollContainer}
       style={styles.container}
     >
-      {/* (4) --- TAMBAHAN BARU --- (Background Pattern) */}
+      <StatusBar barStyle="light-content" />
       <BackgroundSiluet />
 
-      {/* 1. Area Logo & Judul (MODIFIKASI) */}
       <View style={styles.header}>
-        {/* Mengganti <Text style={styles.logo}> dengan Image */}
         <Image
           source={logoSource}
           style={styles.logoImage}
           resizeMode="contain"
         />
-        {/* <Text style={styles.subtitle}>Selamat datang kembali.</Text> */}
-        {/* Desain Figma tidak memiliki subtitle, jadi kita sembunyikan */}
       </View>
 
-      {/* 2. Area Input (Sudah menggunakan CustomTextInput) */}
       <View style={styles.inputArea}>
         <CustomTextInput
           iconName="email-outline"
@@ -68,6 +69,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
+          editable={!isLoading}
         />
         <CustomTextInput
           iconName="lock-outline"
@@ -75,59 +77,52 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           value={password}
           onChangeText={setPassword}
           secureTextEntry
+          editable={!isLoading} 
         />
       </View>
-
-      {/* 3. Tombol Utama (Sudah menggunakan PrimaryButton) */}
-      <PrimaryButton title="Masuk" onPress={handleLogin} />
-
+      <PrimaryButton
+        title="Masuk"
+        onPress={handleLogin}
+        isLoading={isLoading} 
+      />
       <View style={styles.footer}>
         <Text style={styles.footerText}>Belum punya akun?</Text>
         <TouchableOpacity
           onPress={() => {
-            /* navigate ke Register */
           }}
         >
           <Text style={styles.registerText}>Daftar</Text>
         </TouchableOpacity>
       </View>
-
-      {/* (5) --- TAMBAHAN BARU --- (Social Login Sesuai Figma) */}
       <View style={styles.socialLoginContainer}>
-        {/* Tombol Google */}
         <TouchableOpacity style={styles.socialButton}>
           <Icon name="google" size={24} color="#DB4437" />
         </TouchableOpacity>
-
-        {/* Tombol Apple */}
         <TouchableOpacity style={styles.socialButton}>
           <Icon name="apple" size={28} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
-    </ScrollView> // <-- Penutup ScrollView
+    </ScrollView>
   );
 };
 
-// --- STYLESHEET YANG DIPERBARUI ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#616161',
   },
   scrollContainer: {
-    flexGrow: 1, // Memastikan bisa scroll
+    flexGrow: 1,
     paddingHorizontal: 30,
-    paddingTop: 80, // Mengurangi padding atas agar logo pas
-    paddingBottom: 40, // Memberi ruang di bawah
+    paddingTop: 80,
+    paddingBottom: 40,
   },
   header: {
-    marginBottom: 40, // Mengurangi margin bawah
+    marginBottom: 40,
     alignItems: 'center',
   },
-  // (HAPUS style logo teks)
-  // (TAMBAHKAN style logo image)
   logoImage: {
-    width: 150, // Sesuaikan ukuran logo
+    width: 150,
     height: 150,
     marginBottom: 10,
   },
@@ -137,7 +132,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   inputArea: {
-    marginBottom: 20, // Mengurangi margin bawah
+    marginBottom: 20,
   },
   footer: {
     flexDirection: 'row',
@@ -152,11 +147,10 @@ const styles = StyleSheet.create({
     color: '#FFD66A',
     fontWeight: 'bold',
   },
-  // (TAMBAHAN BARU: Social Login Styles)
   socialLoginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 30, // Jarak dari footer
+    marginTop: 30,
   },
   socialButton: {
     width: 60,

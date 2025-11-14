@@ -3,51 +3,37 @@ import {
   View,
   Text,
   StyleSheet,
+  Image,
+  StatusBar,
+  TouchableOpacity,
+  Alert,
   FlatList,
   ActivityIndicator,
-  TouchableOpacity,
 } from 'react-native';
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-// Import tipe data dan service
-import { SurahData } from '../types/data';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { HomeTabParamList } from '../types/navigation';
-import { getSurahList } from '../api/QuranService'; // Service API yang baru dibuat
 
-// Tipe props untuk Tab Navigator
+const quranIllustration = require('../assets/images/quran.png');
+import { SurahData } from '../types/data';
+import { getSurahList } from '../api/QuranService';
+import SurahListItem from '../components/ListSurah';
+
 type QuranScreenProps = BottomTabScreenProps<HomeTabParamList, 'Al-Quran'>;
 
-// Komponen Item Daftar Surah (Kategori 4 & 7: Reusable Component)
-const SurahListItem: React.FC<{ surah: SurahData }> = ({ surah }) => {
-  return (
-    <TouchableOpacity
-      style={styles.listItem}
-      onPress={() => {
-        /* navigation.navigate('DetailSurah', { surahId: surah.id }) */
-      }}
-    >
-      <View style={styles.numberCircle}>
-        <Text style={styles.numberText}>{surah.nomor_surah}</Text>
-      </View>
-      <View style={styles.infoContainer}>
-        <Text style={styles.titleText}>{surah.nama_latin}</Text>
-        <Text style={styles.subtitleText}>
-          {surah.arti} · {surah.jumlah_ayat} Ayat
-        </Text>
-      </View>
-      <Text style={styles.arabicText}>{surah.nama_arab}</Text>
-    </TouchableOpacity>
-  );
-};
+const QuranScreen: React.FC<QuranScreenProps> = ({ navigation }) => {
+  const handleGoBack = () => {
+    navigation.navigate('Beranda');
+  };
 
-const QuranScreen: React.FC<QuranScreenProps> = () => {
-  // Kategori 4: State Management & Hooks
+  const showNotImplementedAlert = () => {
+    Alert.alert('Info', 'Fitur ini belum di implementasikan');
+  };
+
   const [surahList, setSurahList] = useState<SurahData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Kategori 4: useEffect untuk pengambilan data saat komponen dimuat
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -56,141 +42,183 @@ const QuranScreen: React.FC<QuranScreenProps> = () => {
         setSurahList(list);
         setError(null);
       } catch (err) {
-        // Kategori 6: Menangkap error API
-        setError('Gagal memuat daftar surah. Cek koneksi atau MockAPI.');
+        setError('Gagal memuat daftar surah. Cek MockAPI/Koneksi.');
       } finally {
         setIsLoading(false);
       }
     };
     fetchData();
   }, []);
-
-  // Kategori 6: Mengelola loading/error states
-  if (isLoading) {
-    return (
-      <View style={[styles.container, styles.center]}>
-        <ActivityIndicator size="large" color="#FFD700" />
-        <Text style={styles.loadingText}>Memuat daftar surah...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={[styles.container, styles.center]}>
-        <Text style={styles.errorText}>{error}</Text>
-      </View>
-    );
-  }
+  const renderItem = ({ item }: { item: SurahData }) => (
+    <SurahListItem surah={item} onPress={() => {}} />
+  );
 
   return (
     <View style={styles.container}>
-      {/* Header Statis Sesuai Desain Figma */}
+      <StatusBar barStyle="light-content" />
+
       <View style={styles.header}>
+        <TouchableOpacity onPress={handleGoBack}>
+          <Icon name="chevron-left" style={styles.headerIcon} />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Al-Qur'an</Text>
-        <View style={styles.tabContainer}>
-          <Text style={styles.activeTab}>Surah</Text>
-          <Text style={styles.inactiveTab}>Juz</Text>
-          <Text style={styles.inactiveTab}>Disimpan</Text>
-        </View>
+        <View style={styles.headerRightPlaceholder} />
       </View>
 
-      {/* Daftar Surah (Kategori 3: Fungsionalitas - FlatList) */}
-      <FlatList
-        data={surahList}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => <SurahListItem surah={item} />}
-        contentContainerStyle={{ paddingHorizontal: 15 }}
-      />
+      <View style={styles.lastReadCard}>
+        <View style={styles.lastReadInfo}>
+          <Text style={styles.lastReadLabel}>Terakhir dibaca</Text>
+          <Text style={styles.lastReadSurah}>An-Naba'</Text>
+          <TouchableOpacity style={styles.lastReadButton}>
+            <Text style={styles.lastReadButtonText}>Kembali membaca</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Image
+          source={quranIllustration}
+          style={styles.lastReadImage}
+          resizeMode="contain"
+        />
+      </View>
+
+      <View style={styles.segmentControl}>
+        <TouchableOpacity style={[styles.segmentButton, styles.segmentActive]}>
+          <Text style={[styles.segmentText, styles.segmentTextActive]}>
+            Surah
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.segmentButton}
+          onPress={showNotImplementedAlert}
+        >
+          <Text style={styles.segmentText}>Juz</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.segmentButton}
+          onPress={showNotImplementedAlert}
+        >
+          <Text style={styles.segmentText}>Disimpan</Text>
+        </TouchableOpacity>
+      </View>
+      
+      {isLoading ? (
+        <ActivityIndicator
+          style={{ marginTop: 20 }}
+          size="large"
+          color="#FFD700"
+        />
+      ) : error ? (
+        <Text style={styles.errorText}>{error}</Text>
+      ) : (
+        <FlatList
+          data={surahList}
+          renderItem={renderItem}
+          keyExtractor={item => item.id.toString()}
+          style={styles.list}
+        />
+      )}
     </View>
   );
 };
 
-// --- Stylesheets ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0A1828',
+    paddingHorizontal: 20,
   },
-  center: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: { color: '#FFF', marginTop: 10 },
-  errorText: { color: 'red', fontSize: 16 },
   header: {
-    paddingHorizontal: 15,
-    paddingTop: 50,
-    paddingBottom: 20,
-    backgroundColor: '#0A1828',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 30,
+  },
+  headerIcon: {
+    fontSize: 32,
+    color: '#FFF',
   },
   headerTitle: {
-    fontSize: 28,
     color: '#FFF',
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 22,
+    fontFamily: 'Gilroy-Bold',
   },
-  tabContainer: {
+  headerRightPlaceholder: {
+    width: 32,
+  },
+  lastReadCard: {
+    backgroundColor: '#FED769',
+    borderRadius: 15,
+    padding: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  lastReadInfo: {
+    flex: 1,
+  },
+  lastReadLabel: {
+    color: '#0A1828',
+    fontSize: 12,
+    textTransform: 'uppercase',
+    opacity: 0.8,
+  },
+  lastReadSurah: {
+    color: '#0A1828',
+    fontSize: 20,
+    fontFamily: 'Gilroy-Bold',
+    marginVertical: 5,
+  },
+  lastReadButton: {
+    backgroundColor: '#0A1828',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    marginTop: 10,
+    alignSelf: 'flex-start',
+  },
+  lastReadButtonText: {
+    color: '#FED769',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  lastReadImage: {
+    width: 80,
+    height: 80,
+    marginLeft: 10,
+  },
+  segmentControl: {
     flexDirection: 'row',
     backgroundColor: '#1E2A3A',
     borderRadius: 10,
-    padding: 5,
+    marginBottom: 15,
   },
-  activeTab: {
+  segmentButton: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  segmentActive: {
     backgroundColor: '#FFD700',
-    color: '#0A1828',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    fontWeight: 'bold',
   },
-  inactiveTab: {
+  segmentText: {
     color: '#FFF',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
+    fontFamily: 'Gilroy-Bold',
+    fontSize: 14,
   },
-  // Style untuk List Item
-  listItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1E2A3A',
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#FFD70050',
-  },
-  numberCircle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#FFD700',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  numberText: {
+  segmentTextActive: {
     color: '#0A1828',
-    fontWeight: 'bold',
   },
-  infoContainer: {
+  list: {
     flex: 1,
   },
-  titleText: {
-    color: '#FFF',
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 20,
     fontSize: 16,
-    fontWeight: 'bold',
-  },
-  subtitleText: {
-    color: '#CCC',
-    fontSize: 12,
-    marginTop: 2,
-  },
-  arabicText: {
-    color: '#FFD700',
-    fontSize: 20,
-    fontWeight: 'bold',
-    // Perlu font Arabic yang tepat untuk render yang benar
   },
 });
 

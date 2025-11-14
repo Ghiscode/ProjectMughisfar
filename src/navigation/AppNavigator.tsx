@@ -14,15 +14,9 @@ const AppNavigator: React.FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {/* 1. Alur Awal */}
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
-
-        {/* 2. Alur Setelah Login */}
         <Stack.Screen name="AppTabs" component={HomeTabNavigator} />
-
-        {/* Tambahkan rute detail di sini jika ada */}
-        {/* <Stack.Screen name="DetailSurah" component={DetailSurahScreen} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

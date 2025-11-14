@@ -10,9 +10,8 @@ import {
 // Definisikan tipe props
 interface PrimaryButtonProps extends TouchableOpacityProps {
   title: string;
-  isLoading?: boolean; // Untuk penanganan loading state (Kategori 6)
+  isLoading?: boolean; 
 }
-
 const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   title,
   isLoading = false,
@@ -30,9 +29,8 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       disabled={disabled || isLoading}
       {...props}
     >
-      {/* Kategori 6: Mengelola loading state */}
       {isLoading ? (
-        <ActivityIndicator color="#0A1828" /> // Warna gelap untuk kontras
+        <ActivityIndicator color="#0A1828" /> 
       ) : (
         <Text style={styles.buttonText}>{title}</Text>
       )}
@@ -42,12 +40,11 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#FFD66A', // Warna Emas
+    backgroundColor: '#FFD66A',
     borderRadius: 50,
     paddingVertical: 15,
     alignItems: 'center',
     marginBottom: 20,
-    // Kategori 8: Efek Sederhana
     shadowColor: '#FFD66A',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
@@ -55,10 +52,10 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   buttonDisabled: {
-    backgroundColor: '#999900', // Emas yang lebih gelap saat disabled
+    backgroundColor: '#999900',
   },
   buttonText: {
-    color: '#0A1828', // Teks tombol gelap
+    color: '#0A1828',
     fontSize: 18,
     fontWeight: 'bold',
   },

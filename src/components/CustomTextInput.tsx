@@ -2,9 +2,9 @@ import React from 'react';
 import { View, TextInput, StyleSheet, TextInputProps } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-// Definisikan tipe props untuk komponen ini
+
 interface CustomTextInputProps extends TextInputProps {
-  iconName: string; // Nama ikon (misalnya 'email-outline')
+  iconName: string; 
   placeholder: string;
 }
 
@@ -15,25 +15,20 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
 }) => {
   return (
     <View style={styles.inputContainer}>
-      {/* Kategori 2: UI & Design - Implementasi Ikon */}
       <Icon
         name={iconName}
         size={20}
         color="#FFD700"
         style={styles.inputIcon}
       />
-
-      {/* Kategori 7: Code Quality - Meneruskan semua props TextInput */}
       <TextInput
         style={[styles.input, style]}
         placeholderTextColor="#888"
-        // Menerima semua props standar (value, onChangeText, secureTextEntry, dll.)
         {...props}
       />
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',

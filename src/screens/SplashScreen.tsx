@@ -2,14 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../types/navigation';
-
-// (1) IMPORT KOMPONEN REUSABLE BARU
 import BackgroundSiluet from '../components/BackgroundSiluet.tsx';
 import PrimaryButton from '../components/PrimaryButton.tsx';
 
-// (2) HAPUS `patternSource` DARI SINI (karena sudah pindah ke BackgroundSiluet.tsx)
 const logoSource = require('../assets/images/bulanSabitLogin.png');
-// const patternSource = require('../assets/images/siluetMasjid.png'); // <-- SUDAH TIDAK DIPERLUKAN DI SINI
 
 type SplashScreenProps = StackScreenProps<RootStackParamList, 'Splash'>;
 
@@ -20,13 +16,8 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* (3) GANTI <Image ... /> DENGAN KOMPONEN BARU */}
       <BackgroundSiluet />
-      {/* --- END LATAR BELAKANG --- */}
-
-      {/* 2. AREA UTAMA LOGO & TEKS */}
       <View style={styles.contentArea}>
-        {/* Logo Bulan Bintang Emas */}
         <Image
           source={logoSource}
           style={styles.logoImage}
@@ -34,7 +25,6 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
         />
       </View>
 
-      {/* 3. Tombol "Mulai" (Diposisikan dengan margin auto untuk proporsi) */}
       <PrimaryButton
         style={styles.button}
         onPress={handleStart}
@@ -47,12 +37,11 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#616161', // (Menggunakan style Anda)
+    backgroundColor: '#616161',
     paddingTop: 150,
     paddingHorizontal: 30,
     alignItems: 'center',
   },
-  // (4) STYLE contentArea (PENTING AGAR POSISI LOGO TETAP)
   contentArea: {
     alignItems: 'center',
   },
@@ -62,7 +51,7 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 'auto',
-    bottom: 230, // (Menggunakan style Anda)
+    bottom: 230,
     width: '70%',
     alignSelf: 'center',
   },
@@ -71,14 +60,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-
-  // (5) HAPUS `styles.backgroundImage` DARI SINI
-  // (Karena style ini sudah pindah ke BackgroundSiluet.tsx)
-  /*
-  backgroundImage: {
-    ...
-  },
-  */
 });
 
 export default SplashScreen;

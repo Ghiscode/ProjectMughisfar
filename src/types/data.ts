@@ -1,22 +1,30 @@
 // src/types/navigation.ts
 import { NavigatorScreenParams } from '@react-navigation/native';
 
-// (1) UBAH TIPE DATA INI
-// Ganti dari (Beranda, Al-Quran, Zakat, Dzikir)
-// Menjadi (Beranda, Search, Profile)
 export type HomeTabParamList = {
-  Beranda: undefined; // (Ikon Home Kiri)
-  Search: undefined; // (Ikon Search Tengah)
-  Profile: undefined; // (Ikon Profile Kanan)
+  Beranda: undefined; 
+  Profile: undefined; 
 };
 
-// (2) Sisanya tetap sama
 export type RootStackParamList = {
   Splash: undefined;
   Login: undefined;
   AppTabs: NavigatorScreenParams<HomeTabParamList>;
   DetailSurah: { surahId: number };
 };
+
+export interface SurahData {
+  id: number;
+  nomor_surah: number;
+  nama_latin: string;
+  nama_arab: string;
+}
+
+export interface UserData {
+  id: number | string;
+  email: string;
+  password: string;
+}
 
 export type AppRoutes = keyof RootStackParamList;
 export type HomeTabRoutes = keyof HomeTabParamList;
